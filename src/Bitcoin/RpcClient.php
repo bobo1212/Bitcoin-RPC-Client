@@ -9,10 +9,7 @@ class RpcClient
      * @property string WolletName
      */
     private $wolletName;
-    /**
-     * @var HttpClientInterface
-     */
-    private $httpClient;
+
     /**
      * @var string
      */
@@ -28,19 +25,16 @@ class RpcClient
 
     /**
      * RpcClient constructor.
-     * @param HttpClientInterface $httpClient
      * @param string $user
      * @param string $pass
      * @param int $port
      */
     public function __construct(
-        HttpClientInterface $httpClient,
         string $user,
         string $pass,
         int $port = 18332
     )
     {
-        $this->httpClient = $httpClient;
         $this->user = $user;
         $this->pass = $pass;
         $this->port = $port;
@@ -61,12 +55,21 @@ class RpcClient
                 'params' => $params
             ])
         ];
-        $resJson = $this->httpClient->post($data);
+        $resJson = $this->post($data);
         if (!is_string($resJson)) {
             throw new \Exception('Bitcoin RPC error');
         }
         return json_decode($resJson);
 
+    }
+
+    /**
+     * @param array $data
+     * @return string
+     */
+    private function post(array $data): string
+    {
+        return '';
     }
 
     /**
