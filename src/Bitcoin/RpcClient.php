@@ -69,7 +69,18 @@ class RpcClient
      */
     private function post(array $data): string
     {
-        return '';
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $data['url']);
+        if (array_key_exists('post', $data)) {
+            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data['post']);
+        }
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        $strona = curl_exec($curl);
+        curl_close($curl);
+        return $strona;
+
     }
 
     /**
