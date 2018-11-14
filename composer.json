@@ -1,4 +1,10 @@
 {
+    "name": "bobo1212/bitcoin",
+    "authors": [
+        {
+            "name": "Bobo1212"
+        }
+    ],
     "repositories": [
         {
             "type": "vcs",
