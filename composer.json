@@ -27,7 +27,8 @@
     },
     "require": {
         "bobo1212/netcurl": "dev-master",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-curl": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^7.4"
