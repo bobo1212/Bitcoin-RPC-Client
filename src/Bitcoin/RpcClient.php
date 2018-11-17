@@ -154,17 +154,17 @@ class RpcClient
     }
 
     /**
-     * @param string $address                 (string, required) The bitcoin address to send to.
-     * @param float $amount                   (numeric or string, required) The amount in BTC to send. eg 0.1
-     * @param string $comment                 (string, optional) A comment used to store what the transaction is for. This is not part of the transaction, just kept in your wallet.
-     * @param string $commentTo               (string, optional) A comment to store the name of the person or organization
+     * @param string $address (string, required) The bitcoin address to send to.
+     * @param float $amount (numeric or string, required) The amount in BTC to send. eg 0.1
+     * @param string $comment (string, optional) A comment used to store what the transaction is for. This is not part of the transaction, just kept in your wallet.
+     * @param string $commentTo (string, optional) A comment to store the name of the person or organization
      *                                          to which you're sending the transaction. This is not part of the
      *                                          transaction, just kept in your wallet.
-     * @param boolean $subtractfeefromamount  (boolean, optional, default=false) The fee will be deducted from the amount being sent.
+     * @param boolean $subtractfeefromamount (boolean, optional, default=false) The fee will be deducted from the amount being sent.
      *                                          The recipient will receive less bitcoins than you enter in the amount field.
-     * @param boolean $replaceable            (boolean, optional) Allow this transaction to be replaced by a transaction with higher fees via BIP 125
-     * @param int $confTarget                 (numeric, optional) Confirmation target (in blocks)
-     * @param string $estimate_mode           (string, optional, default=UNSET) The fee estimate mode, must be one of:
+     * @param boolean $replaceable (boolean, optional) Allow this transaction to be replaced by a transaction with higher fees via BIP 125
+     * @param int $confTarget (numeric, optional) Confirmation target (in blocks)
+     * @param string $estimate_mode (string, optional, default=UNSET) The fee estimate mode, must be one of:
      *                                          "UNSET"
      *                                          "ECONOMICAL"
      *                                          "CONSERVATIVE"
@@ -175,7 +175,7 @@ class RpcClient
         string $address,
         float $amount,
         string $comment = "",
-        string $commentTo ="",
+        string $commentTo = "",
         bool $subtractfeefromamount = false,
         bool $replaceable = false,
         int $confTarget = 1,
@@ -193,24 +193,23 @@ class RpcClient
         ]);
 
     }
+
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
+    public function listlabels()
+    {
+        return $this->get('listlabels');
+    }
+
+    /**
+     * @param string $label
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getaddressesbylabel(string $label)
+    {
+        return $this->get('getaddressesbylabel',[$label]);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
