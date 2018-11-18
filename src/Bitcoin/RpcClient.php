@@ -234,4 +234,26 @@ class RpcClient
     {
         return $this->get('gettransaction', [$txid, $includeWatchonly]);
     }
+
+    /**
+     * @param string $address
+     * @return mixed
+     * @throws \Exception
+     */
+    public function dumpprivkey(string $address)
+    {
+        return $this->get('dumpprivkey', [$address]);
+    }
+
+    /**
+     * @param string $privkey
+     * @param string $label
+     * @param bool $rescan
+     * @return mixed
+     * @throws \Exception
+     */
+    public function importprivkey(string $privkey, $label = '', bool $rescan = true)
+    {
+        return $this->get('importprivkey', [$privkey, $label, $rescan]);
+    }
 }
