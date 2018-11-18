@@ -214,12 +214,12 @@ class RpcClient
     }
 
     /**
-     * @param string $label"       (string, optional) The label name for the address to be linked to. If not provided, the default label "" is used. It can also be set to the empty string "" to represent the default label. The label does not need to exist, it will be created if there is no label by the given name.
-     * @param string $addressType" (string, optional) The address type to use. Options are "legacy", "p2sh-segwit", and "bech32". Default is set by -addresstype.
+     * @param string $label       (string, optional) The label name for the address to be linked to. If not provided, the default label "" is used. It can also be set to the empty string "" to represent the default label. The label does not need to exist, it will be created if there is no label by the given name.
+     * @param string $addressType (string, optional) The address type to use. Options are "legacy", "p2sh-segwit", and "bech32". Default is set by -addresstype.
      * @return mixed
      * @throws \Exception
      */
-    public function getnewaddress(string $label = '', string $addressType = '')
+    public function getnewaddress(string $label = '', string $addressType = null)
     {
         return $this->get('getnewaddress', [$label, $addressType]);
     }
