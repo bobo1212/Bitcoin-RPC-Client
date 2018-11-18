@@ -173,7 +173,7 @@ class RpcClient
      */
     public function sendtoaddress(
         string $address,
-        float $amount,
+        string $amount,
         string $comment = "",
         string $commentTo = "",
         bool $subtractfeefromamount = false,
