@@ -46,7 +46,7 @@ class RpcClient
      * @return mixed
      * @throws \Exception
      */
-    private function get(string $method, $params = [])
+    private function get(string $method, array $params = [])
     {
         $data = [
             'url' => 'http://' . $this->user . ':' . $this->pass . '@127.0.0.1:' . $this->port . '/wallet/' . $this->wolletName,
@@ -255,5 +255,17 @@ class RpcClient
     public function importprivkey(string $privkey, $label = '', bool $rescan = true)
     {
         return $this->get('importprivkey', [$privkey, $label, $rescan]);
+    }
+
+    /**
+     * @param string $txid The transaction id.
+     * @param bool $verbose If false, return a string, otherwise return a json object
+     * @param string|null $blockhash The block in which to look for the transaction
+     * @return  mixed
+     * @throws \Exception
+     */
+    public function getrawtransaction(string $txid, bool $verbose = false, string $blockhash = null)
+    {
+        return $this->get('getrawtransaction', [$txid, $verbose, $blockhash]);
     }
 }
