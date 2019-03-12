@@ -268,4 +268,14 @@ class RpcClient
     {
         return $this->get('getrawtransaction', [$txid, $verbose, $blockhash]);
     }
+    /**
+     * @param hexstring (string, required) The transaction hex string
+     * @param iswitness          (boolean, optional) Whether the transaction hex is a serialized witness transaction
+     * @return  mixed
+     * @throws \Exception
+     */
+    public function decoderawtransaction(string $hexstring, bool $iswitness = null)
+    {
+        return $this->get('decoderawtransaction', [$hexstring, $iswitness]);
+    }
 }
