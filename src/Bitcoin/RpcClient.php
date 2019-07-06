@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Bitcoin;
 
+use Exception;
+
 class RpcClient
 {
     /**
@@ -44,7 +46,7 @@ class RpcClient
      * @param string $method Nzawa metody RpcClient.
      * @param array $params Parametry metody RpcClient.
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     private function get(string $method, array $params = [])
     {
@@ -57,7 +59,7 @@ class RpcClient
         ];
         $resJson = $this->post($data);
         if (!is_string($resJson)) {
-            throw new \Exception('Bitcoin RPC error');
+            throw new Exception('Bitcoin RPC error');
         }
         return json_decode($resJson);
 
@@ -66,6 +68,7 @@ class RpcClient
     /**
      * @param array $data
      * @return string
+     * @throws Exception
      */
     private function post(array $data): string
     {
@@ -78,9 +81,15 @@ class RpcClient
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         $strona = curl_exec($curl);
+
+        if (false === $strona) {
+            $error = curl_error($curl);
+            curl_close($curl);
+            throw new Exception($error);
+        }
+
         curl_close($curl);
         return $strona;
-
     }
 
     /**
@@ -93,7 +102,7 @@ class RpcClient
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function help()
     {
@@ -101,12 +110,12 @@ class RpcClient
     }
 
     /**
-     * @param $wallet_name
+     * @param string $wallet_name
      * @param bool $disable_private_keys
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    public function createwallet($wallet_name, $disable_private_keys = false)
+    public function createwallet(string $wallet_name, $disable_private_keys = false)
     {
         return $this->get('createwallet', [$wallet_name, $disable_private_keys]);
     }
@@ -114,7 +123,7 @@ class RpcClient
     /**
      * @param string $filename
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function loadwallet(string $filename)
     {
@@ -123,7 +132,7 @@ class RpcClient
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getwalletinfo()
     {
@@ -134,7 +143,7 @@ class RpcClient
      * @param int $minconf
      * @param bool $include_watchonly
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getbalance($minconf = 1, $include_watchonly = false)
     {
@@ -146,7 +155,7 @@ class RpcClient
      * @param int $skip
      * @param bool $include_watchonly
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function listtransactions(int $count = 10, int $skip = 0, bool $include_watchonly = false)
     {
@@ -155,7 +164,7 @@ class RpcClient
 
     /**
      * @param string $address (string, required) The bitcoin address to send to.
-     * @param float $amount (numeric or string, required) The amount in BTC to send. eg 0.1
+     * @param string $amount (numeric or string, required) The amount in BTC to send. eg 0.1
      * @param string $comment (string, optional) A comment used to store what the transaction is for. This is not part of the transaction, just kept in your wallet.
      * @param string $commentTo (string, optional) A comment to store the name of the person or organization
      *                                          to which you're sending the transaction. This is not part of the
@@ -169,7 +178,7 @@ class RpcClient
      *                                          "ECONOMICAL"
      *                                          "CONSERVATIVE"
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function sendtoaddress(
         string $address,
@@ -196,7 +205,7 @@ class RpcClient
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function listlabels()
     {
@@ -206,7 +215,7 @@ class RpcClient
     /**
      * @param string $label
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getaddressesbylabel(string $label)
     {
@@ -217,7 +226,7 @@ class RpcClient
      * @param string $label (string, optional) The label name for the address to be linked to. If not provided, the default label "" is used. It can also be set to the empty string "" to represent the default label. The label does not need to exist, it will be created if there is no label by the given name.
      * @param string $addressType (string, optional) The address type to use. Options are "legacy", "p2sh-segwit", and "bech32". Default is set by -addresstype.
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getnewaddress(string $label = '', string $addressType = null)
     {
@@ -228,7 +237,7 @@ class RpcClient
      * @param string $txid
      * @param bool $includeWatchonly
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function gettransaction(string $txid, bool $includeWatchonly = false)
     {
@@ -238,7 +247,7 @@ class RpcClient
     /**
      * @param string $address
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function dumpprivkey(string $address)
     {
@@ -250,7 +259,7 @@ class RpcClient
      * @param string $label
      * @param bool $rescan
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function importprivkey(string $privkey, $label = '', bool $rescan = true)
     {
@@ -262,7 +271,7 @@ class RpcClient
      * @param bool $verbose If false, return a string, otherwise return a json object
      * @param string|null $blockhash The block in which to look for the transaction
      * @return  mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getrawtransaction(string $txid, bool $verbose = false, string $blockhash = null)
     {
@@ -270,10 +279,10 @@ class RpcClient
     }
 
     /**
-     * @param hexstring (string, required) The transaction hex string
-     * @param iswitness          (boolean, optional) Whether the transaction hex is a serialized witness transaction
+     * @param string hexstring (string, required) The transaction hex string
+     * @param boolean iswitness (boolean, optional) Whether the transaction hex is a serialized witness transaction
      * @return  mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function decoderawtransaction(string $hexstring, bool $iswitness = null)
     {
@@ -282,11 +291,176 @@ class RpcClient
 
     /**
      * Returns a list of currently loaded wallets.
+     *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function listwallets()
     {
         return $this->get('listwallets');
+    }
+
+    /**
+     * Dumps all wallet keys in a human-readable format to a server-side file. This does not allow overwriting existing files.
+     * Imported scripts are included in the dumpfile, but corresponding BIP173 addresses, etc. may not be added automatically by importwallet.
+     * Note that if your wallet contains keys which are not derived from your HD seed (e.g. imported keys),
+     * these are not covered by only backing up the seed itself, and must be backed up too (e.g. ensure you back up the whole dumpfile).
+     *
+     * @param string $filename
+     * @return mixed
+     * @throws Exception
+     */
+    public function dumpwallet(string $filename)
+    {
+        return $this->get('dumpwallet', [$filename]);
+    }
+
+    /**
+     * @return mixed
+     * @throws Exception
+     */
+    public function listunspent()
+    {
+        return $this->get('listunspent');
+    }
+
+    /**
+     * Create a transaction spending the given inputs and creating new outputs.
+     * Outputs can be addresses or data.
+     * Returns hex-encoded raw transaction.
+     * Note that the transaction's inputs are not signed, and
+     * it is not stored in the wallet or transmitted to the network.
+     *
+     * @param array $inputs
+     * @param array $outputs
+     * @param integer $locktime
+     * @param boolean $replaceable
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    public function createrawtransaction(array $inputs, array $outputs, int $locktime = 0, bool $replaceable = false)
+    {
+        return $this->get('createrawtransaction', [$inputs, $outputs, $locktime, $replaceable]);
+    }
+
+    /**
+     * Sign inputs for raw transaction (serialized, hex-encoded).
+     * The second optional argument (may be null) is an array of previous transaction outputs that
+     * this transaction depends on but may not yet be in the block chain.
+     *
+     * @param string $hexstring
+     * @param array $prevtxs
+     * @param string $sighashtype
+     * @return mixed
+     * @throws Exception
+     */
+    public function signrawtransactionwithwallet(string $hexstring, array $prevtxs = [], string $sighashtype = 'ALL')
+    {
+        return $this->get('signrawtransactionwithwallet', [$hexstring, $prevtxs, $sighashtype]);
+    }
+
+    /**
+     * Returns if raw transaction (serialized, hex-encoded) would be accepted by mempool.
+     *
+     * @param array $rawtxs
+     * @param bool $allowhighfees
+     * @return mixed
+     * @throws Exception
+     */
+    public function testmempoolaccept(array $rawtxs, bool $allowhighfees = false)
+    {
+        return $this->get('testmempoolaccept', [$rawtxs, $allowhighfees]);
+    }
+
+    /**
+     * Submits raw transaction (serialized, hex-encoded) to local node and network.
+     *
+     * @param string $hexstring
+     * @param bool $allowhighfees
+     * @return mixed
+     * @throws Exception
+     */
+    public function sendrawtransaction(string $hexstring, bool $allowhighfees = false)
+    {
+        return $this->get('sendrawtransaction', [$hexstring, $allowhighfees]);
+    }
+
+    /**
+     * @param float $toSpend
+     * @return array
+     * @throws Exception
+     */
+    private function getUnspendable(float $toSpend)
+    {
+        $listunspent = $this->listunspent();
+        $unspent = [];
+        $sumToSpent = 0;
+        foreach ($listunspent->result as $txo) {
+            $unspent[] = $txo;
+            $sumToSpent += $txo->amount;
+            if ($sumToSpent >= $toSpend) {
+                return $unspent;
+            }
+        }
+        throw new Exception('Ou tof money');
+    }
+
+    /**
+     * @param array $unspent
+     * @return array
+     */
+    private function createRawTransactionInputs(array $unspent)
+    {
+        $inputs = [];
+        foreach ($unspent as $txo) {
+            $inputs[] = [
+                'txid' => $txo->txid,
+                'vout' => $txo->vout,
+                //sequence - parametr opcjonalny
+            ];
+        }
+        return $inputs;
+    }
+
+    // Wylicza reszte z tranzakcji to trzeba wysłać spowrotem n swouj adres bo inaczje bedzie jako ołata i przepadnie !!
+
+    /**
+     * @param array $listunspent
+     * @param float $sumAmountFee
+     * @return float|int
+     */
+    private function giveTheChange(array $listunspent, float $sumAmountFee)
+    {
+        $sumToSpent = 0;
+        foreach ($listunspent as $txo) {
+            $sumToSpent += $txo->amount;
+        }
+        return $sumToSpent - $sumAmountFee;
+    }
+
+    /**
+     * @param string $adress
+     * @param float $amount
+     * @param float $fee
+     * @return mixed
+     * @throws Exception
+     */
+    public function sendToAddressRawTransaction(string $adress, float $amount, float $fee)
+    {
+        $returnAddress = $this->getnewaddress()->result;
+        $sumAmountFee = $amount + $fee;
+        $listunspent = $this->getUnspendable($sumAmountFee);
+        $change = $this->giveTheChange($listunspent, $sumAmountFee);
+        $inputs = $this->createRawTransactionInputs($listunspent);
+        $outputs = [
+            $adress => strval($amount),
+            $returnAddress => strval($change)
+        ];
+
+        $rawtransaction = $this->createrawtransaction($inputs, $outputs);
+        $signrawtransaction = $this->signrawtransactionwithwallet($rawtransaction->result);
+        // $testmempoolaccept = $this->testmempoolaccept([$signrawtransaction->result->hex]);
+        return $this->sendrawtransaction($signrawtransaction->result->hex);
     }
 }
