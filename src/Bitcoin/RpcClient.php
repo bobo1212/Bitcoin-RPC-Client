@@ -391,7 +391,7 @@ class RpcClient
      * @return array
      * @throws Exception
      */
-    private function getUnspendable(float $toSpend)
+    public function getUnspendable(float $toSpend)
     {
         $listunspent = $this->listunspent();
         $unspent = [];
@@ -403,14 +403,14 @@ class RpcClient
                 return $unspent;
             }
         }
-        throw new Exception('Ou tof money');
+        throw new Exception('Ou tof money toSpend:' .$toSpend . ' sendable: '.$sumToSpent);
     }
 
     /**
      * @param array $unspent
      * @return array
      */
-    private function createRawTransactionInputs(array $unspent)
+    private function createRawTransactionInputs(array $unspent): array
     {
         $inputs = [];
         foreach ($unspent as $txo) {
@@ -423,8 +423,6 @@ class RpcClient
         return $inputs;
     }
 
-    // Wylicza reszte z tranzakcji to trzeba wysłać spowrotem n swouj adres bo inaczje bedzie jako ołata i przepadnie !!
-
     /**
      * @param array $listunspent
      * @param float $sumAmountFee
@@ -436,7 +434,27 @@ class RpcClient
         foreach ($listunspent as $txo) {
             $sumToSpent += $txo->amount;
         }
+        // Wylicza reszte z tranzakcji to trzeba wysłać spowrotem na swoj adres bo inaczje bedzie jako opłata i przepadnie !!
         return $sumToSpent - $sumAmountFee;
+    }
+
+    /**
+     * @param float|null $trnsactionSizeInByte
+     * @return float
+     * @throws Exception
+     */
+    public function getFee(float $trnsactionSizeInByte = null): float
+    {
+        $page = file_get_contents('https://bitcoinfees.earn.com/api/v1/fees/recommended');
+        $bitcoinFees = json_decode($page, true);
+        if (!is_array($bitcoinFees) || !array_key_exists('hourFee', $bitcoinFees)) {
+            throw new Exception('Nieda się ustalić opłaty za transfer bitkojna');
+        }
+        $averageTrnsactionSizeInByte = 256;
+        if($trnsactionSizeInByte !== null){
+            $averageTrnsactionSizeInByte = $trnsactionSizeInByte;
+        }
+        return ($bitcoinFees['hourFee'] / 100000000) * $averageTrnsactionSizeInByte;
     }
 
     /**
@@ -448,19 +466,19 @@ class RpcClient
      */
     public function sendToAddressRawTransaction(string $adress, float $amount, float $fee)
     {
-        $returnAddress = $this->getnewaddress()->result;
         $sumAmountFee = $amount + $fee;
         $listunspent = $this->getUnspendable($sumAmountFee);
-        $change = $this->giveTheChange($listunspent, $sumAmountFee);
         $inputs = $this->createRawTransactionInputs($listunspent);
-        $outputs = [
-            $adress => strval($amount),
-            $returnAddress => strval($change)
-        ];
+        $outputs[$adress] = number_format($amount, 8, '.', '');
+
+        $change = $this->giveTheChange($listunspent, $sumAmountFee);
+        if ($change > 0) {
+            $returnAddress = $this->getnewaddress()->result;
+            $outputs[$returnAddress] = number_format($change, 8, '.', '');
+        }
 
         $rawtransaction = $this->createrawtransaction($inputs, $outputs);
         $signrawtransaction = $this->signrawtransactionwithwallet($rawtransaction->result);
-        // $testmempoolaccept = $this->testmempoolaccept([$signrawtransaction->result->hex]);
         return $this->sendrawtransaction($signrawtransaction->result->hex);
     }
 }
