@@ -316,12 +316,15 @@ class RpcClient
     }
 
     /**
+     * @param array $addresses
+     * @param int $minconf
+     * @param int $maxconf
      * @return mixed
      * @throws Exception
      */
-    public function listunspent()
+    public function listunspent(array $addresses, $minconf = 1, $maxconf = 9999999)
     {
-        return $this->get('listunspent');
+        return $this->get('listunspent', [$minconf, $maxconf, $addresses]);
     }
 
     /**
@@ -393,17 +396,20 @@ class RpcClient
      */
     public function getUnspendable(float $toSpend)
     {
-        $listunspent = $this->listunspent();
+        $listunspent = $this->listunspent([]);
         $unspent = [];
         $sumToSpent = 0;
         foreach ($listunspent->result as $txo) {
+            if($txo->spendable != true){
+                continue;
+            }
             $unspent[] = $txo;
             $sumToSpent += $txo->amount;
             if ($sumToSpent >= $toSpend) {
                 return $unspent;
             }
         }
-        throw new Exception('Ou tof money toSpend:' .$toSpend . ' sendable: '.$sumToSpent);
+        throw new Exception('Ou tof money toSpend:' . $toSpend . ' sendable: ' . $sumToSpent);
     }
 
     /**
@@ -414,6 +420,9 @@ class RpcClient
     {
         $inputs = [];
         foreach ($unspent as $txo) {
+            if($txo->spendable != true){
+                continue;
+            }
             $inputs[] = [
                 'txid' => $txo->txid,
                 'vout' => $txo->vout,
@@ -451,7 +460,7 @@ class RpcClient
             throw new Exception('Nieda się ustalić opłaty za transfer bitkojna');
         }
         $averageTrnsactionSizeInByte = 256;
-        if($trnsactionSizeInByte !== null){
+        if ($trnsactionSizeInByte !== null) {
             $averageTrnsactionSizeInByte = $trnsactionSizeInByte;
         }
         return ($bitcoinFees['hourFee'] / 100000000) * $averageTrnsactionSizeInByte;
