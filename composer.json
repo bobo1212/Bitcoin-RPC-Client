@@ -26,7 +26,6 @@
         }
     },
     "require": {
-        "bobo1212/netcurl": "dev-master",
         "ext-json": "*",
         "ext-curl": "*"
     },
