@@ -7,10 +7,6 @@
     ],
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/bobo1212/NetCurl"
-        },
-        {
             "type": "composer",
             "url": "http://packagist.org"
         }
@@ -31,9 +27,5 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^7.4"
-    },
-    "config": {
-        "disable-tls": true,
-        "secure-http": false
     }
 }
