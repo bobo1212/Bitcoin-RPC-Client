@@ -22,7 +22,7 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
         'my_user_name',
         'my_password',
         '127.0.0.1',
-        18332
+        8332
     );
     $balances  = $rpc->getbalances();
     
