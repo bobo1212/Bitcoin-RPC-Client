@@ -15,6 +15,20 @@ Add following lines to composer.json
 
 and run ```composer require bobo1212/bitcoin-rpc-client``` in your project directory.
 
+## Getting started
+
+```php
+    $rpc = new \Bitcoin\RpcClient(
+        'my_user_name',
+        'my_password',
+        '127.0.0.1',
+        18332
+    );
+    $balances  = $rpc->getbalances();
+    
+    var_dump($balances);
+```
+
 
 ## Donations
 If you like this project, please consider donating:<br>
