@@ -58,7 +58,7 @@ class RpcClient
      * @return mixed
      * @throws Exception
      */
-    private function get(string $method, array $params = [])
+    public function request(string $method, array $params = [])
     {
         $host = 'http://' . $this->user . ':' . $this->pass . '@' . $this->host . ':' . $this->port;
         if ($this->wolletName) {
@@ -71,12 +71,12 @@ class RpcClient
                 'params' => $params
             ])
         ];
-        $resJson = $this->post($data);
-        if (!is_string($resJson)) {
+        $res = $this->post($data);
+        $jsonRes = json_decode($res);
+        if ($jsonRes === null) {
             throw new Exception('Bitcoin RPC error');
         }
-        return json_decode($resJson);
-
+        return $jsonRes;
     }
 
     /**
@@ -88,22 +88,19 @@ class RpcClient
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $data['url']);
-        if (array_key_exists('post', $data)) {
-            curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $data['post']);
-        }
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data['post']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        $strona = curl_exec($curl);
+        $curlExecRet = curl_exec($curl);
 
-        if (false === $strona) {
+        if (false === $curlExecRet) {
             $error = curl_error($curl);
             curl_close($curl);
             throw new Exception($error);
         }
 
         curl_close($curl);
-        return $strona;
+        return $curlExecRet;
     }
 
     /**
@@ -119,7 +116,7 @@ class RpcClient
      **/
     public function getbestblockhash()
     {
-        return $this->get('getbestblockhash');
+        return $this->request('getbestblockhash');
     }
 
     /**
@@ -127,7 +124,7 @@ class RpcClient
      **/
     public function getblock(string $blockhash, int $verbosity = null)
     {
-        return $this->get('getblock', [$blockhash, $verbosity]);
+        return $this->request('getblock', [$blockhash, $verbosity]);
     }
 
     /**
@@ -135,7 +132,7 @@ class RpcClient
      **/
     public function getblockchaininfo()
     {
-        return $this->get('getblockchaininfo');
+        return $this->request('getblockchaininfo');
     }
 
     /**
@@ -143,7 +140,7 @@ class RpcClient
      **/
     public function getblockcount()
     {
-        return $this->get('getblockcount');
+        return $this->request('getblockcount');
     }
 
     /**
@@ -151,7 +148,7 @@ class RpcClient
      **/
     public function getblockfilter(string $blockhash, string $filtertype = null)
     {
-        return $this->get('getblockfilter', [$blockhash, $filtertype]);
+        return $this->request('getblockfilter', [$blockhash, $filtertype]);
     }
 
     /**
@@ -159,7 +156,7 @@ class RpcClient
      **/
     public function getblockhash(int $height)
     {
-        return $this->get('getblockhash', [$height]);
+        return $this->request('getblockhash', [$height]);
     }
 
     /**
@@ -167,7 +164,7 @@ class RpcClient
      **/
     public function getblockheader(string $blockhash, bool $verbose = null)
     {
-        return $this->get('getblockheader', [$blockhash, $verbose]);
+        return $this->request('getblockheader', [$blockhash, $verbose]);
     }
 
     /**
@@ -175,7 +172,7 @@ class RpcClient
      **/
     public function getblockstats($hash_or_height, $stats = null)
     {
-        return $this->get('getblockstats', [$hash_or_height, $stats]);
+        return $this->request('getblockstats', [$hash_or_height, $stats]);
     }
 
     /**
@@ -183,7 +180,7 @@ class RpcClient
      **/
     public function getchaintips()
     {
-        return $this->get('getchaintips');
+        return $this->request('getchaintips');
     }
 
     /**
@@ -191,7 +188,7 @@ class RpcClient
      **/
     public function getchaintxstats(int $nblocks = null, string $blockhash = null)
     {
-        return $this->get('getchaintxstats', [$nblocks, $blockhash]);
+        return $this->request('getchaintxstats', [$nblocks, $blockhash]);
     }
 
     /**
@@ -199,7 +196,7 @@ class RpcClient
      **/
     public function getdifficulty()
     {
-        return $this->get('getdifficulty');
+        return $this->request('getdifficulty');
     }
 
     /**
@@ -207,7 +204,7 @@ class RpcClient
      **/
     public function getmempoolancestors(string $txid, bool $verbose = null)
     {
-        return $this->get('getmempoolancestors', [$txid, $verbose]);
+        return $this->request('getmempoolancestors', [$txid, $verbose]);
     }
 
     /**
@@ -215,7 +212,7 @@ class RpcClient
      **/
     public function getmempooldescendants(string $txid, bool $verbose = null)
     {
-        return $this->get('getmempooldescendants', [$txid, $verbose]);
+        return $this->request('getmempooldescendants', [$txid, $verbose]);
     }
 
     /**
@@ -223,7 +220,7 @@ class RpcClient
      **/
     public function getmempoolentry(string $txid)
     {
-        return $this->get('getmempoolentry', [$txid]);
+        return $this->request('getmempoolentry', [$txid]);
     }
 
     /**
@@ -231,7 +228,7 @@ class RpcClient
      **/
     public function getmempoolinfo()
     {
-        return $this->get('getmempoolinfo');
+        return $this->request('getmempoolinfo');
     }
 
     /**
@@ -239,7 +236,7 @@ class RpcClient
      **/
     public function getrawmempool(bool $verbose = null, bool $mempool_sequence = null)
     {
-        return $this->get('getrawmempool', [$verbose, $mempool_sequence]);
+        return $this->request('getrawmempool', [$verbose, $mempool_sequence]);
     }
 
     /**
@@ -247,7 +244,7 @@ class RpcClient
      **/
     public function gettxout(string $txid, int $n, bool $include_mempool = null)
     {
-        return $this->get('gettxout', [$txid, $n, $include_mempool]);
+        return $this->request('gettxout', [$txid, $n, $include_mempool]);
     }
 
     /**
@@ -255,7 +252,7 @@ class RpcClient
      **/
     public function gettxoutproof($txids, string $blockhash = null)
     {
-        return $this->get('gettxoutproof', [$txids, $blockhash]);
+        return $this->request('gettxoutproof', [$txids, $blockhash]);
     }
 
     /**
@@ -263,7 +260,7 @@ class RpcClient
      **/
     public function gettxoutsetinfo(string $hash_type = null)
     {
-        return $this->get('gettxoutsetinfo', [$hash_type]);
+        return $this->request('gettxoutsetinfo', [$hash_type]);
     }
 
     /**
@@ -271,7 +268,7 @@ class RpcClient
      **/
     public function preciousblock(string $blockhash)
     {
-        return $this->get('preciousblock', [$blockhash]);
+        return $this->request('preciousblock', [$blockhash]);
     }
 
     /**
@@ -279,7 +276,7 @@ class RpcClient
      **/
     public function pruneblockchain(int $height)
     {
-        return $this->get('pruneblockchain', [$height]);
+        return $this->request('pruneblockchain', [$height]);
     }
 
     /**
@@ -287,7 +284,7 @@ class RpcClient
      **/
     public function savemempool()
     {
-        return $this->get('savemempool');
+        return $this->request('savemempool');
     }
 
     /**
@@ -295,7 +292,7 @@ class RpcClient
      **/
     public function scantxoutset(string $action, $scanobjects)
     {
-        return $this->get('scantxoutset', [$action, $scanobjects]);
+        return $this->request('scantxoutset', [$action, $scanobjects]);
     }
 
     /**
@@ -303,7 +300,7 @@ class RpcClient
      **/
     public function verifychain(int $checklevel = null, int $nblocks = null)
     {
-        return $this->get('verifychain', [$checklevel, $nblocks]);
+        return $this->request('verifychain', [$checklevel, $nblocks]);
     }
 
     /**
@@ -311,7 +308,7 @@ class RpcClient
      **/
     public function verifytxoutproof(string $proof)
     {
-        return $this->get('verifytxoutproof', [$proof]);
+        return $this->request('verifytxoutproof', [$proof]);
     }
 
     /**
@@ -319,7 +316,7 @@ class RpcClient
      **/
     public function getmemoryinfo(string $mode = null)
     {
-        return $this->get('getmemoryinfo', [$mode]);
+        return $this->request('getmemoryinfo', [$mode]);
     }
 
     /**
@@ -327,7 +324,7 @@ class RpcClient
      **/
     public function getrpcinfo()
     {
-        return $this->get('getrpcinfo');
+        return $this->request('getrpcinfo');
     }
 
     /**
@@ -335,7 +332,7 @@ class RpcClient
      **/
     public function help(string $command = null)
     {
-        return $this->get('help', [$command]);
+        return $this->request('help', [$command]);
     }
 
     /**
@@ -343,7 +340,7 @@ class RpcClient
      **/
     public function logging($include = null, $exclude = null)
     {
-        return $this->get('logging', [$include, $exclude]);
+        return $this->request('logging', [$include, $exclude]);
     }
 
     /**
@@ -351,7 +348,7 @@ class RpcClient
      **/
     public function stop()
     {
-        return $this->get('stop');
+        return $this->request('stop');
     }
 
     /**
@@ -359,7 +356,7 @@ class RpcClient
      **/
     public function uptime()
     {
-        return $this->get('uptime');
+        return $this->request('uptime');
     }
 
     /**
@@ -367,7 +364,7 @@ class RpcClient
      **/
     public function generateblock(string $output, $transactions)
     {
-        return $this->get('generateblock', [$output, $transactions]);
+        return $this->request('generateblock', [$output, $transactions]);
     }
 
     /**
@@ -375,7 +372,7 @@ class RpcClient
      **/
     public function generatetoaddress(int $nblocks, string $address, int $maxtries = null)
     {
-        return $this->get('generatetoaddress', [$nblocks, $address, $maxtries]);
+        return $this->request('generatetoaddress', [$nblocks, $address, $maxtries]);
     }
 
     /**
@@ -383,7 +380,7 @@ class RpcClient
      **/
     public function generatetodescriptor(int $num_blocks, string $descriptor, int $maxtries = null)
     {
-        return $this->get('generatetodescriptor', [$num_blocks, $descriptor, $maxtries]);
+        return $this->request('generatetodescriptor', [$num_blocks, $descriptor, $maxtries]);
     }
 
     /**
@@ -391,7 +388,7 @@ class RpcClient
      **/
     public function getblocktemplate($template_request = null)
     {
-        return $this->get('getblocktemplate', [$template_request]);
+        return $this->request('getblocktemplate', [$template_request]);
     }
 
     /**
@@ -399,7 +396,7 @@ class RpcClient
      **/
     public function getmininginfo()
     {
-        return $this->get('getmininginfo');
+        return $this->request('getmininginfo');
     }
 
     /**
@@ -407,7 +404,7 @@ class RpcClient
      **/
     public function getnetworkhashps(int $nblocks = null, int $height = null)
     {
-        return $this->get('getnetworkhashps', [$nblocks, $height]);
+        return $this->request('getnetworkhashps', [$nblocks, $height]);
     }
 
     /**
@@ -415,7 +412,7 @@ class RpcClient
      **/
     public function prioritisetransaction(string $txid, int $dummy = null, int $fee_delta)
     {
-        return $this->get('prioritisetransaction', [$txid, $dummy, $fee_delta]);
+        return $this->request('prioritisetransaction', [$txid, $dummy, $fee_delta]);
     }
 
     /**
@@ -423,7 +420,7 @@ class RpcClient
      **/
     public function submitblock(string $hexdata, string $dummy = null)
     {
-        return $this->get('submitblock', [$hexdata, $dummy]);
+        return $this->request('submitblock', [$hexdata, $dummy]);
     }
 
     /**
@@ -431,7 +428,7 @@ class RpcClient
      **/
     public function submitheader(string $hexdata)
     {
-        return $this->get('submitheader', [$hexdata]);
+        return $this->request('submitheader', [$hexdata]);
     }
 
     /**
@@ -439,7 +436,7 @@ class RpcClient
      **/
     public function addnode(string $node, string $command)
     {
-        return $this->get('addnode', [$node, $command]);
+        return $this->request('addnode', [$node, $command]);
     }
 
     /**
@@ -447,7 +444,7 @@ class RpcClient
      **/
     public function clearbanned()
     {
-        return $this->get('clearbanned');
+        return $this->request('clearbanned');
     }
 
     /**
@@ -455,7 +452,7 @@ class RpcClient
      **/
     public function disconnectnode(string $address = null, int $nodeid = null)
     {
-        return $this->get('disconnectnode', [$address, $nodeid]);
+        return $this->request('disconnectnode', [$address, $nodeid]);
     }
 
     /**
@@ -463,7 +460,7 @@ class RpcClient
      **/
     public function getaddednodeinfo(string $node = null)
     {
-        return $this->get('getaddednodeinfo', [$node]);
+        return $this->request('getaddednodeinfo', [$node]);
     }
 
     /**
@@ -471,7 +468,7 @@ class RpcClient
      **/
     public function getconnectioncount()
     {
-        return $this->get('getconnectioncount');
+        return $this->request('getconnectioncount');
     }
 
     /**
@@ -479,7 +476,7 @@ class RpcClient
      **/
     public function getnettotals()
     {
-        return $this->get('getnettotals');
+        return $this->request('getnettotals');
     }
 
     /**
@@ -487,7 +484,7 @@ class RpcClient
      **/
     public function getnetworkinfo()
     {
-        return $this->get('getnetworkinfo');
+        return $this->request('getnetworkinfo');
     }
 
     /**
@@ -495,7 +492,7 @@ class RpcClient
      **/
     public function getnodeaddresses(int $count = null)
     {
-        return $this->get('getnodeaddresses', [$count]);
+        return $this->request('getnodeaddresses', [$count]);
     }
 
     /**
@@ -503,7 +500,7 @@ class RpcClient
      **/
     public function getpeerinfo()
     {
-        return $this->get('getpeerinfo');
+        return $this->request('getpeerinfo');
     }
 
     /**
@@ -511,7 +508,7 @@ class RpcClient
      **/
     public function listbanned()
     {
-        return $this->get('listbanned');
+        return $this->request('listbanned');
     }
 
     /**
@@ -519,7 +516,7 @@ class RpcClient
      **/
     public function ping()
     {
-        return $this->get('ping');
+        return $this->request('ping');
     }
 
     /**
@@ -527,7 +524,7 @@ class RpcClient
      **/
     public function setban(string $subnet, string $command, int $bantime = null, bool $absolute = null)
     {
-        return $this->get('setban', [$subnet, $command, $bantime, $absolute]);
+        return $this->request('setban', [$subnet, $command, $bantime, $absolute]);
     }
 
     /**
@@ -535,7 +532,7 @@ class RpcClient
      **/
     public function setnetworkactive(bool $state)
     {
-        return $this->get('setnetworkactive', [$state]);
+        return $this->request('setnetworkactive', [$state]);
     }
 
     /**
@@ -543,7 +540,7 @@ class RpcClient
      **/
     public function analyzepsbt(string $psbt)
     {
-        return $this->get('analyzepsbt', [$psbt]);
+        return $this->request('analyzepsbt', [$psbt]);
     }
 
     /**
@@ -551,7 +548,7 @@ class RpcClient
      **/
     public function combinepsbt($txs)
     {
-        return $this->get('combinepsbt', [$txs]);
+        return $this->request('combinepsbt', [$txs]);
     }
 
     /**
@@ -559,7 +556,7 @@ class RpcClient
      **/
     public function combinerawtransaction($txs)
     {
-        return $this->get('combinerawtransaction', [$txs]);
+        return $this->request('combinerawtransaction', [$txs]);
     }
 
     /**
@@ -567,7 +564,7 @@ class RpcClient
      **/
     public function converttopsbt(string $hexstring, bool $permitsigdata = null, bool $iswitness = null)
     {
-        return $this->get('converttopsbt', [$hexstring, $permitsigdata, $iswitness]);
+        return $this->request('converttopsbt', [$hexstring, $permitsigdata, $iswitness]);
     }
 
     /**
@@ -575,7 +572,7 @@ class RpcClient
      **/
     public function createpsbt($inputs, $outputs, int $locktime = null, bool $replaceable = null)
     {
-        return $this->get('createpsbt', [$inputs, $outputs, $locktime, $replaceable]);
+        return $this->request('createpsbt', [$inputs, $outputs, $locktime, $replaceable]);
     }
 
     /**
@@ -583,7 +580,7 @@ class RpcClient
      **/
     public function createrawtransaction($inputs, $outputs, int $locktime = null, bool $replaceable = null)
     {
-        return $this->get('createrawtransaction', [$inputs, $outputs, $locktime, $replaceable]);
+        return $this->request('createrawtransaction', [$inputs, $outputs, $locktime, $replaceable]);
     }
 
     /**
@@ -591,7 +588,7 @@ class RpcClient
      **/
     public function decodepsbt(string $psbt)
     {
-        return $this->get('decodepsbt', [$psbt]);
+        return $this->request('decodepsbt', [$psbt]);
     }
 
     /**
@@ -599,7 +596,7 @@ class RpcClient
      **/
     public function decoderawtransaction(string $hexstring, bool $iswitness = null)
     {
-        return $this->get('decoderawtransaction', [$hexstring, $iswitness]);
+        return $this->request('decoderawtransaction', [$hexstring, $iswitness]);
     }
 
     /**
@@ -607,7 +604,7 @@ class RpcClient
      **/
     public function decodescript(string $hexstring)
     {
-        return $this->get('decodescript', [$hexstring]);
+        return $this->request('decodescript', [$hexstring]);
     }
 
     /**
@@ -615,7 +612,7 @@ class RpcClient
      **/
     public function finalizepsbt(string $psbt, bool $extract = null)
     {
-        return $this->get('finalizepsbt', [$psbt, $extract]);
+        return $this->request('finalizepsbt', [$psbt, $extract]);
     }
 
     /**
@@ -623,7 +620,7 @@ class RpcClient
      **/
     public function fundrawtransaction(string $hexstring, $options = null, bool $iswitness = null)
     {
-        return $this->get('fundrawtransaction', [$hexstring, $options, $iswitness]);
+        return $this->request('fundrawtransaction', [$hexstring, $options, $iswitness]);
     }
 
     /**
@@ -631,7 +628,7 @@ class RpcClient
      **/
     public function getrawtransaction(string $txid, bool $verbose = null, string $blockhash = null)
     {
-        return $this->get('getrawtransaction', [$txid, $verbose, $blockhash]);
+        return $this->request('getrawtransaction', [$txid, $verbose, $blockhash]);
     }
 
     /**
@@ -639,7 +636,7 @@ class RpcClient
      **/
     public function joinpsbts($txs)
     {
-        return $this->get('joinpsbts', [$txs]);
+        return $this->request('joinpsbts', [$txs]);
     }
 
     /**
@@ -647,7 +644,7 @@ class RpcClient
      **/
     public function sendrawtransaction(string $hexstring, $maxfeerate = null)
     {
-        return $this->get('sendrawtransaction', [$hexstring, $maxfeerate]);
+        return $this->request('sendrawtransaction', [$hexstring, $maxfeerate]);
     }
 
     /**
@@ -655,7 +652,7 @@ class RpcClient
      **/
     public function signrawtransactionwithkey(string $hexstring, $privkeys, $prevtxs = null, string $sighashtype = null)
     {
-        return $this->get('signrawtransactionwithkey', [$hexstring, $privkeys, $prevtxs, $sighashtype]);
+        return $this->request('signrawtransactionwithkey', [$hexstring, $privkeys, $prevtxs, $sighashtype]);
     }
 
     /**
@@ -663,7 +660,7 @@ class RpcClient
      **/
     public function testmempoolaccept($rawtxs, $maxfeerate = null)
     {
-        return $this->get('testmempoolaccept', [$rawtxs, $maxfeerate]);
+        return $this->request('testmempoolaccept', [$rawtxs, $maxfeerate]);
     }
 
     /**
@@ -671,7 +668,7 @@ class RpcClient
      **/
     public function utxoupdatepsbt(string $psbt, $descriptors = null)
     {
-        return $this->get('utxoupdatepsbt', [$psbt, $descriptors]);
+        return $this->request('utxoupdatepsbt', [$psbt, $descriptors]);
     }
 
     /**
@@ -679,7 +676,7 @@ class RpcClient
      **/
     public function createmultisig(int $nrequired, $keys, string $address_type = null)
     {
-        return $this->get('createmultisig', [$nrequired, $keys, $address_type]);
+        return $this->request('createmultisig', [$nrequired, $keys, $address_type]);
     }
 
     /**
@@ -687,7 +684,7 @@ class RpcClient
      **/
     public function deriveaddresses(string $descriptor, $range = null)
     {
-        return $this->get('deriveaddresses', [$descriptor, $range]);
+        return $this->request('deriveaddresses', [$descriptor, $range]);
     }
 
     /**
@@ -695,7 +692,7 @@ class RpcClient
      **/
     public function estimatesmartfee(int $conf_target, string $estimate_mode = null)
     {
-        return $this->get('estimatesmartfee', [$conf_target, $estimate_mode]);
+        return $this->request('estimatesmartfee', [$conf_target, $estimate_mode]);
     }
 
     /**
@@ -703,7 +700,7 @@ class RpcClient
      **/
     public function getdescriptorinfo(string $descriptor)
     {
-        return $this->get('getdescriptorinfo', [$descriptor]);
+        return $this->request('getdescriptorinfo', [$descriptor]);
     }
 
     /**
@@ -711,7 +708,7 @@ class RpcClient
      **/
     public function getindexinfo(string $index_name = null)
     {
-        return $this->get('getindexinfo', [$index_name]);
+        return $this->request('getindexinfo', [$index_name]);
     }
 
     /**
@@ -719,7 +716,7 @@ class RpcClient
      **/
     public function signmessagewithprivkey(string $privkey, string $message)
     {
-        return $this->get('signmessagewithprivkey', [$privkey, $message]);
+        return $this->request('signmessagewithprivkey', [$privkey, $message]);
     }
 
     /**
@@ -727,7 +724,7 @@ class RpcClient
      **/
     public function validateaddress(string $address)
     {
-        return $this->get('validateaddress', [$address]);
+        return $this->request('validateaddress', [$address]);
     }
 
     /**
@@ -735,7 +732,7 @@ class RpcClient
      **/
     public function verifymessage(string $address, string $signature, string $message)
     {
-        return $this->get('verifymessage', [$address, $signature, $message]);
+        return $this->request('verifymessage', [$address, $signature, $message]);
     }
 
     /**
@@ -743,7 +740,7 @@ class RpcClient
      **/
     public function abandontransaction(string $txid)
     {
-        return $this->get('abandontransaction', [$txid]);
+        return $this->request('abandontransaction', [$txid]);
     }
 
     /**
@@ -751,7 +748,7 @@ class RpcClient
      **/
     public function abortrescan()
     {
-        return $this->get('abortrescan');
+        return $this->request('abortrescan');
     }
 
     /**
@@ -759,7 +756,7 @@ class RpcClient
      **/
     public function addmultisigaddress(int $nrequired, $keys, string $label = null, string $address_type = null)
     {
-        return $this->get('addmultisigaddress', [$nrequired, $keys, $label, $address_type]);
+        return $this->request('addmultisigaddress', [$nrequired, $keys, $label, $address_type]);
     }
 
     /**
@@ -767,7 +764,7 @@ class RpcClient
      **/
     public function backupwallet(string $destination)
     {
-        return $this->get('backupwallet', [$destination]);
+        return $this->request('backupwallet', [$destination]);
     }
 
     /**
@@ -775,7 +772,7 @@ class RpcClient
      **/
     public function bumpfee(string $txid, $options = null)
     {
-        return $this->get('bumpfee', [$txid, $options]);
+        return $this->request('bumpfee', [$txid, $options]);
     }
 
     /**
@@ -783,7 +780,7 @@ class RpcClient
      **/
     public function createwallet(string $wallet_name, bool $disable_private_keys = null, bool $blank = null, string $passphrase, bool $avoid_reuse = null, bool $descriptors = null, bool $load_on_startup = null)
     {
-        return $this->get('createwallet', [$wallet_name, $disable_private_keys, $blank, $passphrase, $avoid_reuse, $descriptors, $load_on_startup]);
+        return $this->request('createwallet', [$wallet_name, $disable_private_keys, $blank, $passphrase, $avoid_reuse, $descriptors, $load_on_startup]);
     }
 
     /**
@@ -791,7 +788,7 @@ class RpcClient
      **/
     public function dumpprivkey(string $address)
     {
-        return $this->get('dumpprivkey', [$address]);
+        return $this->request('dumpprivkey', [$address]);
     }
 
     /**
@@ -799,7 +796,7 @@ class RpcClient
      **/
     public function dumpwallet(string $filename)
     {
-        return $this->get('dumpwallet', [$filename]);
+        return $this->request('dumpwallet', [$filename]);
     }
 
     /**
@@ -807,7 +804,7 @@ class RpcClient
      **/
     public function encryptwallet(string $passphrase)
     {
-        return $this->get('encryptwallet', [$passphrase]);
+        return $this->request('encryptwallet', [$passphrase]);
     }
 
     /**
@@ -815,7 +812,7 @@ class RpcClient
      **/
     public function getaddressesbylabel(string $label)
     {
-        return $this->get('getaddressesbylabel', [$label]);
+        return $this->request('getaddressesbylabel', [$label]);
     }
 
     /**
@@ -823,7 +820,7 @@ class RpcClient
      **/
     public function getaddressinfo(string $address)
     {
-        return $this->get('getaddressinfo', [$address]);
+        return $this->request('getaddressinfo', [$address]);
     }
 
     /**
@@ -831,7 +828,7 @@ class RpcClient
      **/
     public function getbalance(string $dummy = null, int $minconf = null, bool $include_watchonly = null, bool $avoid_reuse = null)
     {
-        return $this->get('getbalance', [$dummy, $minconf, $include_watchonly, $avoid_reuse]);
+        return $this->request('getbalance', [$dummy, $minconf, $include_watchonly, $avoid_reuse]);
     }
 
     /**
@@ -839,7 +836,7 @@ class RpcClient
      **/
     public function getbalances()
     {
-        return $this->get('getbalances');
+        return $this->request('getbalances');
     }
 
     /**
@@ -847,7 +844,7 @@ class RpcClient
      **/
     public function getnewaddress(string $label = null, string $address_type = null)
     {
-        return $this->get('getnewaddress', [$label, $address_type]);
+        return $this->request('getnewaddress', [$label, $address_type]);
     }
 
     /**
@@ -855,7 +852,7 @@ class RpcClient
      **/
     public function getrawchangeaddress(string $address_type = null)
     {
-        return $this->get('getrawchangeaddress', [$address_type]);
+        return $this->request('getrawchangeaddress', [$address_type]);
     }
 
     /**
@@ -863,7 +860,7 @@ class RpcClient
      **/
     public function getreceivedbyaddress(string $address, int $minconf = null)
     {
-        return $this->get('getreceivedbyaddress', [$address, $minconf]);
+        return $this->request('getreceivedbyaddress', [$address, $minconf]);
     }
 
     /**
@@ -871,7 +868,7 @@ class RpcClient
      **/
     public function getreceivedbylabel(string $label, int $minconf = null)
     {
-        return $this->get('getreceivedbylabel', [$label, $minconf]);
+        return $this->request('getreceivedbylabel', [$label, $minconf]);
     }
 
     /**
@@ -879,7 +876,7 @@ class RpcClient
      **/
     public function gettransaction(string $txid, bool $include_watchonly = null, bool $verbose = null)
     {
-        return $this->get('gettransaction', [$txid, $include_watchonly, $verbose]);
+        return $this->request('gettransaction', [$txid, $include_watchonly, $verbose]);
     }
 
     /**
@@ -887,7 +884,7 @@ class RpcClient
      **/
     public function getunconfirmedbalance()
     {
-        return $this->get('getunconfirmedbalance');
+        return $this->request('getunconfirmedbalance');
     }
 
     /**
@@ -895,7 +892,7 @@ class RpcClient
      **/
     public function getwalletinfo()
     {
-        return $this->get('getwalletinfo');
+        return $this->request('getwalletinfo');
     }
 
     /**
@@ -903,7 +900,7 @@ class RpcClient
      **/
     public function importaddress(string $address, string $label = null, bool $rescan = null, bool $p2sh = null)
     {
-        return $this->get('importaddress', [$address, $label, $rescan, $p2sh]);
+        return $this->request('importaddress', [$address, $label, $rescan, $p2sh]);
     }
 
     /**
@@ -911,7 +908,7 @@ class RpcClient
      **/
     public function importdescriptors($requests)
     {
-        return $this->get('importdescriptors', [$requests]);
+        return $this->request('importdescriptors', [$requests]);
     }
 
     /**
@@ -919,7 +916,7 @@ class RpcClient
      **/
     public function importmulti($requests, $options = null)
     {
-        return $this->get('importmulti', [$requests, $options]);
+        return $this->request('importmulti', [$requests, $options]);
     }
 
     /**
@@ -927,7 +924,7 @@ class RpcClient
      **/
     public function importprivkey(string $privkey, string $label = null, bool $rescan = null)
     {
-        return $this->get('importprivkey', [$privkey, $label, $rescan]);
+        return $this->request('importprivkey', [$privkey, $label, $rescan]);
     }
 
     /**
@@ -935,7 +932,7 @@ class RpcClient
      **/
     public function importprunedfunds(string $rawtransaction, string $txoutproof)
     {
-        return $this->get('importprunedfunds', [$rawtransaction, $txoutproof]);
+        return $this->request('importprunedfunds', [$rawtransaction, $txoutproof]);
     }
 
     /**
@@ -943,7 +940,7 @@ class RpcClient
      **/
     public function importpubkey(string $pubkey, string $label = null, bool $rescan = null)
     {
-        return $this->get('importpubkey', [$pubkey, $label, $rescan]);
+        return $this->request('importpubkey', [$pubkey, $label, $rescan]);
     }
 
     /**
@@ -951,7 +948,7 @@ class RpcClient
      **/
     public function importwallet(string $filename)
     {
-        return $this->get('importwallet', [$filename]);
+        return $this->request('importwallet', [$filename]);
     }
 
     /**
@@ -959,7 +956,7 @@ class RpcClient
      **/
     public function keypoolrefill(int $newsize = null)
     {
-        return $this->get('keypoolrefill', [$newsize]);
+        return $this->request('keypoolrefill', [$newsize]);
     }
 
     /**
@@ -967,7 +964,7 @@ class RpcClient
      **/
     public function listaddressgroupings()
     {
-        return $this->get('listaddressgroupings');
+        return $this->request('listaddressgroupings');
     }
 
     /**
@@ -975,7 +972,7 @@ class RpcClient
      **/
     public function listlabels(string $purpose = null)
     {
-        return $this->get('listlabels', [$purpose]);
+        return $this->request('listlabels', [$purpose]);
     }
 
     /**
@@ -983,7 +980,7 @@ class RpcClient
      **/
     public function listlockunspent()
     {
-        return $this->get('listlockunspent');
+        return $this->request('listlockunspent');
     }
 
     /**
@@ -991,7 +988,7 @@ class RpcClient
      **/
     public function listreceivedbyaddress(int $minconf = null, bool $include_empty = null, bool $include_watchonly = null, string $address_filter = null)
     {
-        return $this->get('listreceivedbyaddress', [$minconf, $include_empty, $include_watchonly, $address_filter]);
+        return $this->request('listreceivedbyaddress', [$minconf, $include_empty, $include_watchonly, $address_filter]);
     }
 
     /**
@@ -999,7 +996,7 @@ class RpcClient
      **/
     public function listreceivedbylabel(int $minconf = null, bool $include_empty = null, bool $include_watchonly = null)
     {
-        return $this->get('listreceivedbylabel', [$minconf, $include_empty, $include_watchonly]);
+        return $this->request('listreceivedbylabel', [$minconf, $include_empty, $include_watchonly]);
     }
 
     /**
@@ -1007,7 +1004,7 @@ class RpcClient
      **/
     public function listsinceblock(string $blockhash = null, int $target_confirmations = null, bool $include_watchonly = null, bool $include_removed = null)
     {
-        return $this->get('listsinceblock', [$blockhash, $target_confirmations, $include_watchonly, $include_removed]);
+        return $this->request('listsinceblock', [$blockhash, $target_confirmations, $include_watchonly, $include_removed]);
     }
 
     /**
@@ -1015,7 +1012,7 @@ class RpcClient
      **/
     public function listtransactions(string $label = null, int $count = null, int $skip = null, bool $include_watchonly = null)
     {
-        return $this->get('listtransactions', [$label, $count, $skip, $include_watchonly]);
+        return $this->request('listtransactions', [$label, $count, $skip, $include_watchonly]);
     }
 
     /**
@@ -1023,7 +1020,7 @@ class RpcClient
      **/
     public function listunspent(int $minconf = null, int $maxconf = null, $addresses = null, bool $include_unsafe = null, $query_options = null)
     {
-        return $this->get('listunspent', [$minconf, $maxconf, $addresses, $include_unsafe, $query_options]);
+        return $this->request('listunspent', [$minconf, $maxconf, $addresses, $include_unsafe, $query_options]);
     }
 
     /**
@@ -1031,7 +1028,7 @@ class RpcClient
      **/
     public function listwalletdir()
     {
-        return $this->get('listwalletdir');
+        return $this->request('listwalletdir');
     }
 
     /**
@@ -1039,7 +1036,7 @@ class RpcClient
      **/
     public function listwallets()
     {
-        return $this->get('listwallets');
+        return $this->request('listwallets');
     }
 
     /**
@@ -1047,7 +1044,7 @@ class RpcClient
      **/
     public function loadwallet(string $filename, bool $load_on_startup = null)
     {
-        return $this->get('loadwallet', [$filename, $load_on_startup]);
+        return $this->request('loadwallet', [$filename, $load_on_startup]);
     }
 
     /**
@@ -1055,7 +1052,7 @@ class RpcClient
      **/
     public function lockunspent(bool $unlock, $transactions = null)
     {
-        return $this->get('lockunspent', [$unlock, $transactions]);
+        return $this->request('lockunspent', [$unlock, $transactions]);
     }
 
     /**
@@ -1063,7 +1060,7 @@ class RpcClient
      **/
     public function psbtbumpfee(string $txid, $options = null)
     {
-        return $this->get('psbtbumpfee', [$txid, $options]);
+        return $this->request('psbtbumpfee', [$txid, $options]);
     }
 
     /**
@@ -1071,7 +1068,7 @@ class RpcClient
      **/
     public function removeprunedfunds(string $txid)
     {
-        return $this->get('removeprunedfunds', [$txid]);
+        return $this->request('removeprunedfunds', [$txid]);
     }
 
     /**
@@ -1079,7 +1076,7 @@ class RpcClient
      **/
     public function rescanblockchain(int $start_height = null, int $stop_height = null)
     {
-        return $this->get('rescanblockchain', [$start_height, $stop_height]);
+        return $this->request('rescanblockchain', [$start_height, $stop_height]);
     }
 
     /**
@@ -1087,7 +1084,7 @@ class RpcClient
      **/
     public function send($outputs, int $conf_target = null, string $estimate_mode = null, $fee_rate = null, $options = null)
     {
-        return $this->get('send', [$outputs, $conf_target, $estimate_mode, $fee_rate, $options]);
+        return $this->request('send', [$outputs, $conf_target, $estimate_mode, $fee_rate, $options]);
     }
 
     /**
@@ -1095,7 +1092,7 @@ class RpcClient
      **/
     public function sendmany(string $dummy, $amounts, int $minconf = null, string $comment = null, $subtractfeefrom = null, bool $replaceable = null, int $conf_target = null, string $estimate_mode = null, $fee_rate = null)
     {
-        return $this->get('sendmany', [$dummy, $amounts, $minconf, $comment, $subtractfeefrom, $replaceable, $conf_target, $estimate_mode, $fee_rate]);
+        return $this->request('sendmany', [$dummy, $amounts, $minconf, $comment, $subtractfeefrom, $replaceable, $conf_target, $estimate_mode, $fee_rate]);
     }
 
     /**
@@ -1103,7 +1100,7 @@ class RpcClient
      **/
     public function sendtoaddress(string $address, $amount, string $comment = null, string $comment_to = null, bool $subtractfeefromamount = null, bool $replaceable = null, int $conf_target = null, string $estimate_mode = null, bool $avoid_reuse = null)
     {
-        return $this->get('sendtoaddress', [$address, $amount, $comment, $comment_to, $subtractfeefromamount, $replaceable, $conf_target, $estimate_mode, $avoid_reuse]);
+        return $this->request('sendtoaddress', [$address, $amount, $comment, $comment_to, $subtractfeefromamount, $replaceable, $conf_target, $estimate_mode, $avoid_reuse]);
     }
 
     /**
@@ -1111,7 +1108,7 @@ class RpcClient
      **/
     public function sethdseed(bool $newkeypool = null, string $seed = null)
     {
-        return $this->get('sethdseed', [$newkeypool, $seed]);
+        return $this->request('sethdseed', [$newkeypool, $seed]);
     }
 
     /**
@@ -1119,7 +1116,7 @@ class RpcClient
      **/
     public function setlabel(string $address, string $label)
     {
-        return $this->get('setlabel', [$address, $label]);
+        return $this->request('setlabel', [$address, $label]);
     }
 
     /**
@@ -1127,7 +1124,7 @@ class RpcClient
      **/
     public function settxfee($amount)
     {
-        return $this->get('settxfee', [$amount]);
+        return $this->request('settxfee', [$amount]);
     }
 
     /**
@@ -1135,7 +1132,7 @@ class RpcClient
      **/
     public function setwalletflag(string $flag, bool $value = null)
     {
-        return $this->get('setwalletflag', [$flag, $value]);
+        return $this->request('setwalletflag', [$flag, $value]);
     }
 
     /**
@@ -1143,7 +1140,7 @@ class RpcClient
      **/
     public function signmessage(string $address, string $message)
     {
-        return $this->get('signmessage', [$address, $message]);
+        return $this->request('signmessage', [$address, $message]);
     }
 
     /**
@@ -1151,7 +1148,7 @@ class RpcClient
      **/
     public function signrawtransactionwithwallet(string $hexstring, $prevtxs = null, string $sighashtype = null)
     {
-        return $this->get('signrawtransactionwithwallet', [$hexstring, $prevtxs, $sighashtype]);
+        return $this->request('signrawtransactionwithwallet', [$hexstring, $prevtxs, $sighashtype]);
     }
 
     /**
@@ -1159,7 +1156,7 @@ class RpcClient
      **/
     public function unloadwallet(string $wallet_name = null, bool $load_on_startup = null)
     {
-        return $this->get('unloadwallet', [$wallet_name, $load_on_startup]);
+        return $this->request('unloadwallet', [$wallet_name, $load_on_startup]);
     }
 
     /**
@@ -1167,7 +1164,7 @@ class RpcClient
      **/
     public function upgradewallet(int $version = null)
     {
-        return $this->get('upgradewallet', [$version]);
+        return $this->request('upgradewallet', [$version]);
     }
 
     /**
@@ -1175,7 +1172,7 @@ class RpcClient
      **/
     public function walletcreatefundedpsbt($inputs = null, $outputs, int $locktime = null, $options = null, bool $bip32derivs = null)
     {
-        return $this->get('walletcreatefundedpsbt', [$inputs, $outputs, $locktime, $options, $bip32derivs]);
+        return $this->request('walletcreatefundedpsbt', [$inputs, $outputs, $locktime, $options, $bip32derivs]);
     }
 
     /**
@@ -1183,7 +1180,7 @@ class RpcClient
      **/
     public function walletlock()
     {
-        return $this->get('walletlock');
+        return $this->request('walletlock');
     }
 
     /**
@@ -1191,7 +1188,7 @@ class RpcClient
      **/
     public function walletpassphrase(string $passphrase, int $timeout)
     {
-        return $this->get('walletpassphrase', [$passphrase, $timeout]);
+        return $this->request('walletpassphrase', [$passphrase, $timeout]);
     }
 
     /**
@@ -1199,7 +1196,7 @@ class RpcClient
      **/
     public function walletpassphrasechange(string $oldpassphrase, string $newpassphrase)
     {
-        return $this->get('walletpassphrasechange', [$oldpassphrase, $newpassphrase]);
+        return $this->request('walletpassphrasechange', [$oldpassphrase, $newpassphrase]);
     }
 
     /**
@@ -1207,6 +1204,6 @@ class RpcClient
      **/
     public function walletprocesspsbt(string $psbt, bool $sign = null, string $sighashtype = null, bool $bip32derivs = null)
     {
-        return $this->get('walletprocesspsbt', [$psbt, $sign, $sighashtype, $bip32derivs]);
+        return $this->request('walletprocesspsbt', [$psbt, $sign, $sighashtype, $bip32derivs]);
     }
 }

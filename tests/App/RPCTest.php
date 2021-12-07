@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Test\App;
+namespace Bitcoin\Tests\App;
 
 use PHPUnit\Framework\TestCase;
 use Bitcoin\RpcClient;
@@ -15,29 +15,20 @@ final class RPCTest extends TestCase
      */
     private $rpcClient;
 
-    /**
-     * @return RpcClient
-     */
-    public function getRpcClient()
-    {
-        return $this->rpcClient;
-    }
-
     protected function setUp()
     {
-
-        $this->rpcClient = new RpcClient();
+        $this->rpcClient = new RpcClient(
+            getenv('bitcoind_test_user'),
+            getenv('bitcoind_test_password'),
+            '127.0.0.1',
+            8332
+        );
     }
 
-    public function testCanBeCreatedFromValidEmailAddress(): void
+    public function testCanGetBalance(): void
     {
-
-        //$this->rpcClient->loadwallet('fikumiku');
-        $this->rpcClient->setWolletName('');
-        $ret = $this->rpcClient->getwalletinfo();
-        $ret = $this->rpcClient->listlabels();
-        $ret = $this->rpcClient->getaddressesbylabel("");
-        var_dump($ret);
+        $ret = $this->rpcClient->getbalances();
+        $this->assertEquals(null,$ret->error);
+        $this->assertTrue(is_numeric($ret->result->mine->trusted));
     }
-
 }
