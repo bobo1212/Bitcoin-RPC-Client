@@ -1,5 +1,4 @@
 <?php
-declare(strict_types=1);
 
 namespace Bitcoin;
 
@@ -12,7 +11,7 @@ use Exception;
 class RpcClient
 {
     /**
-     * @property string WolletName
+     * @var string
      */
     private $wolletName;
 
@@ -31,25 +30,25 @@ class RpcClient
     /**
      * @var string
      */
-    private $url;
+    private $host;
 
     /**
      * RpcClient constructor.
      * @param string $user
      * @param string $pass
-     * @param string $url
+     * @param string $host
      * @param int $port
      */
     public function __construct(
         string $user,
         string $pass,
-        string $url = '127.0.0.1',
+        string $host = '127.0.0.1',
         int $port = 18332
     )
     {
         $this->user = $user;
         $this->pass = $pass;
-        $this->url = $url;
+        $this->host = $host;
         $this->port = $port;
     }
 
@@ -61,12 +60,12 @@ class RpcClient
      */
     private function get(string $method, array $params = [])
     {
-        $url = 'http://' . $this->user . ':' . $this->pass . '@' . $this->url . ':' . $this->port;
+        $host = 'http://' . $this->user . ':' . $this->pass . '@' . $this->host . ':' . $this->port;
         if ($this->wolletName) {
-            $url .= '/wallet/' . $this->wolletName;
+            $host .= '/wallet/' . $this->wolletName;
         }
         $data = [
-            'url' => $url,
+            'url' => $host,
             'post' => json_encode([
                 'method' => $method,
                 'params' => $params
