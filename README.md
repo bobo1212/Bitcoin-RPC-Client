@@ -1,7 +1,7 @@
 # A simple PHP client for bitcoin rpc.
 
 ## Installation with Composer
---------------------------
+
 Add following lines to composer.json
 ```json
     "repositories": [
@@ -11,7 +11,6 @@ Add following lines to composer.json
         }
     ]
 ```
-
 
 and run ```composer require bobo1212/bitcoin-rpc-client``` in your project directory.
 
