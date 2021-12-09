@@ -30,8 +30,8 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
         '127.0.0.1',
         8332
     );
-    $balances  = $rpc->getbalances();
     
+    $balances = $rpc->getbalances();
     var_dump($balances);
 ```
 ## How to send bitcoins
@@ -43,8 +43,8 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
         '127.0.0.1',
         8332
     );
-    $ret  = $rpc->sendtoaddress('38kXJgKubEEojpzQe91T3dU6BKiwgN2euo', 0.0001);
     
+    $ret = $rpc->sendtoaddress('38kXJgKubEEojpzQe91T3dU6BKiwgN2euo', 0.0001);
     var_dump($ret);
 ```
 ## Donations
