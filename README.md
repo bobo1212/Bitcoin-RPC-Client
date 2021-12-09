@@ -50,5 +50,4 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
 ## Donations
 If you like this project, please consider donating:<br>
 **BTC**: 38kXJgKubEEojpzQe91T3dU6BKiwgN2euo<br>
-
 ❤Thanks for your support!❤
