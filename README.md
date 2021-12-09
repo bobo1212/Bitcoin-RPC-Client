@@ -34,8 +34,19 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
     
     var_dump($balances);
 ```
+## How to send bitcoins
+```php
 
-
+    $rpc = new \Bitcoin\RpcClient(
+        'my_user_name',
+        'my_password',
+        '127.0.0.1',
+        8332
+    );
+    $ret  = $rpc->sendtoaddress('38kXJgKubEEojpzQe91T3dU6BKiwgN2euo', 0.0001);
+    
+    var_dump($ret);
+```
 ## Donations
 If you like this project, please consider donating:<br>
 **BTC**: 38kXJgKubEEojpzQe91T3dU6BKiwgN2euo<br>
