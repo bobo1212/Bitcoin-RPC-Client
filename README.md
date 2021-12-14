@@ -22,25 +22,41 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
      * if you're not already done it anywhere else in your project.
      **/
     // require 'vendor/autoload.php';
-
+    
+    $user = 'my_user_name';
+    $password = 'my_password';
+    $host = 'localhost';
+    $port = 8332;
+    
     $rpc = new \Bitcoin\RpcClient(
-        'my_user_name',
-        'my_password',
-        '127.0.0.1',
-        8332
+        $user,
+        $password,
+        $host,
+        $port
     );
     
-    $balances = $rpc->getbalances();
-    var_dump($balances);
+    $ret = $rpcClient->getbalances();
+    if (null === $ret->error) {
+        echo 'trusted: ' . $ret->result->mine->trusted . "\n";
+        echo 'untrusted_pending: ' . $ret->result->mine->untrusted_pending . "\n";
+        echo 'immature: ' . $ret->result->mine->immature . "\n";
+    } else {
+        echo 'error: ' . $ret->error . "\n";
+    }
 ```
 ## How to send bitcoins
 ```php
 
+    $user = 'my_user_name';
+    $password = 'my_password';
+    $host = 'localhost';
+    $port = 8332;
+    
     $rpc = new \Bitcoin\RpcClient(
-        'my_user_name',
-        'my_password',
-        '127.0.0.1',
-        8332
+        $user,
+        $password,
+        $host,
+        $port
     );
     
     $ret = $rpc->sendtoaddress('38kXJgKubEEojpzQe91T3dU6BKiwgN2euo', 0.0001);
@@ -53,3 +69,7 @@ If you like this project, please consider donating:<br>
   <img src="assets/qrcode.png">
 </p>
 ❤Thanks for your support!❤
+
+
+##Contact
+For business inquiries: bobo1212@wp.pl
