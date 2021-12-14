@@ -36,6 +36,7 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
     );
     
     $ret = $rpcClient->getbalances();
+    
     if (null === $ret->error) {
         echo 'trusted: ' . $ret->result->mine->trusted . "\n";
         echo 'untrusted_pending: ' . $ret->result->mine->untrusted_pending . "\n";
