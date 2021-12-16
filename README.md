@@ -37,12 +37,12 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
     
     $ret = $rpcClient->getbalances();
     
-    if (null === $ret->error) {
+    if ($ret->error) {
+        echo 'error: ' . $ret->error . "\n";
+    } else {
         echo 'trusted: ' . $ret->result->mine->trusted . "\n";
         echo 'untrusted_pending: ' . $ret->result->mine->untrusted_pending . "\n";
         echo 'immature: ' . $ret->result->mine->immature . "\n";
-    } else {
-        echo 'error: ' . $ret->error . "\n";
     }
 ```
 ## How to send bitcoins
