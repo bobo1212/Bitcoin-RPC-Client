@@ -45,7 +45,7 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
         echo 'immature: ' . $ret->result->mine->immature . "\n";
     }
 ```
-## How to send bitcoins
+## Send 0.0001 bitcoin to address 38kXJgKubEEojpzQe91T3dU6BKiwgN2euo:
 ```php
 
     $user = 'my_user_name';
