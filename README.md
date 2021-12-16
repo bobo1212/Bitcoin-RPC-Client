@@ -46,7 +46,7 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
     }
 ```
 ## How to send BTC:
-### Send 0.0001 bitcoin to address 38kXJgKubEEojpzQe91T3dU6BKiwgN2euo:
+Send 0.0001 bitcoin to address 38kXJgKubEEojpzQe91T3dU6BKiwgN2euo:
 ```php
 
     $user = 'my_user_name';
@@ -64,7 +64,7 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
     $ret = $rpc->sendtoaddress('38kXJgKubEEojpzQe91T3dU6BKiwgN2euo', 0.0001);
     var_dump($ret);
 ```
-###Send 0.1 BTC with a confirmation target of 6 blocks in economical fee estimate mode using positional arguments:
+Send 0.1 BTC with a confirmation target of 6 blocks in economical fee estimate mode using positional arguments:
 ```php
 
     $user = 'my_user_name';
