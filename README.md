@@ -64,7 +64,7 @@ Send 0.0001 bitcoin to address 38kXJgKubEEojpzQe91T3dU6BKiwgN2euo:
     $ret = $rpc->sendtoaddress('38kXJgKubEEojpzQe91T3dU6BKiwgN2euo', 0.0001);
     var_dump($ret);
 ```
-Send 0.1 BTC with a confirmation target of 6 blocks in economical fee estimate mode using positional arguments:
+Send 0.0001 BTC with a confirmation target of 6 blocks in economical fee estimate mode using positional arguments:
 ```php
 
     $user = 'my_user_name';
