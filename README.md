@@ -72,5 +72,5 @@ If you like this project, please consider donating:<br>
 ❤Thanks for your support!❤
 
 
-##Contact
+## Contact
 For business inquiries: bobo1212@wp.pl
