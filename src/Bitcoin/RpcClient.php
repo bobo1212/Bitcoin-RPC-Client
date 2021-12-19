@@ -74,7 +74,7 @@ class RpcClient
 
         $res = $this->post($data);
 
-        if ($res['httpCode'] != '200') {
+        if ($res['httpCode'] == '401') {
             $msg = explode("\n", $res['header'], 2)[0];
             throw new Exception($msg);
         }
