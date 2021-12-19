@@ -71,8 +71,14 @@ class RpcClient
                 'params' => $params
             ])
         ];
+
         $res = $this->post($data);
-        $jsonRes = json_decode($res);
+
+        if ($res['httpCode'] != '200') {
+            $msg = explode("\n", $res['header'], 2)[0];
+            throw new Exception($msg);
+        }
+        $jsonRes = json_decode($res['body']);
         if ($jsonRes === null) {
             throw new Exception('Bitcoin RPC error');
         }
@@ -84,23 +90,29 @@ class RpcClient
      * @return string
      * @throws Exception
      */
-    private function post(array $data): string
+    private function post(array $data): array
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $data['url']);
         curl_setopt($curl, CURLOPT_POST, 1);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data['post']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $curlExecRet = curl_exec($curl);
+        curl_setopt($curl, CURLOPT_HEADER, 1);
+        $response = curl_exec($curl);
 
-        if (false === $curlExecRet) {
+        if (false === $response) {
             $error = curl_error($curl);
             curl_close($curl);
             throw new Exception($error);
         }
-
+        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-        return $curlExecRet;
+        return [
+            'header' => substr($response, 0, $headerSize),
+            'body' => substr($response, $headerSize),
+            'httpCode' => $httpCode
+        ];
     }
 
     /**
