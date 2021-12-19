@@ -14,6 +14,13 @@ Add following lines to composer.json
 
 and run ```composer require bobo1212/bitcoin-rpc-client``` in your project directory.
 
+
+## Table of Contents
+
+- [Getting started](#getting-started)
+- [How to send BTC](#How-to-send-btc)
+- [Donations](#donations)
+
 ## Getting started
 
 ```php
