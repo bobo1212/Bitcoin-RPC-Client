@@ -109,4 +109,4 @@ If you like this project, please consider donating:<br>
 
 
 ## Contact
-For business inquiries: bobo1212@wp.pl
+bobo1212@wp.pl
