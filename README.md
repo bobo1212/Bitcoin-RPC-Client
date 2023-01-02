@@ -43,7 +43,7 @@ and run ```composer require bobo1212/bitcoin-rpc-client``` in your project direc
         $port
     );
     
-    $ret = $rpcClient->getbalances();
+    $ret = $rpc->getbalances();
     
     if ($ret->error) {
         echo 'error: ' . $ret->error . "\n";
